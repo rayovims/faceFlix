@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>JSSample</title>
+    <title>FaceFlix</title>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
   </head>
 
@@ -25,7 +25,9 @@
     $("#submit").on("click", function() {
 
         //https://facesofbellingham.files.wordpress.com/2008/05/1154.jpg
-        var imageURL = $("#face").val();
+        // var imageURL = $("#face").val();
+        var imageURL = "https://facesofbellingham.files.wordpress.com/2008/05/1154.jpg";
+
         console.log(imageURL);
 
         $.ajax({
@@ -51,26 +53,27 @@
             console.log(emotion)
 
             if (emotion == "anger") {
-                emotion = "Action"
+                emotion = 28
             }
             if (emotion == "contempt") {
-                emotion = "Crime"
+                emotion = 80
             }
             if (emotion == "disgust") {
-                emotion = "Adventure"
+                emotion = 12
             }
             if (emotion == "fear") {
-                emotion = "Horror"
+                emotion = 27
             }
             if (emotion == "happiness") {
-                emotion = "Comedy"
+                emotion = 35
             }
 
             
             $("#movies").html("");
 
-            $.ajax({ url: `https://api.themoviedb.org/3/search/movie?api_key=6e1b8777347082a5bc02993cce05f3ab&language=en-US&query=${emotion}&page=1&include_adult=false`}
+            $.ajax({ url: `https://api.themoviedb.org/3/discover/movie?api_key=6e1b8777347082a5bc02993cce05f3ab&language=en-US&with_genres=${emotion}&page=1&include_adult=false`}
             ).then(function (movie) {
+                console.log(movie)
 
                 var posterLink = "https://image.tmdb.org/t/p/w500";
                 var title = [];
