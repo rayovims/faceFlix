@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>JSSample</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+  </head>
+
+  <h1>Enter Picture URL (BETA)</h1>
+  <input width="30%" placeholder="EX: google.com/pic.png" id="face" />
+  <button id="submit">Submit</button>
+
+  </ul>
+
+  <div id="movies">
+      <p id=" title"></p>
+  </div>
+
+  <body>
+    <script type="text/javascript">
+    $("#submit").on("click", function() {
+
+        //https://facesofbellingham.files.wordpress.com/2008/05/1154.jpg
+        var imageURL = $("#face").val();
+        console.log(imageURL);
+
+        $.ajax({
+            url: "https://eastus.api.cognitive.microsoft.com/face/v1.0/detect?returnFaceAttributes=emotion",
+            beforeSend: function(xhrObj){
+                xhrObj.setRequestHeader("Content-Type","application/json");
+                xhrObj.setRequestHeader("Ocp-Apim-Subscription-Key","0d8fcfa4afbb4db5ab4b0e59a7a981ca");
+            },
+            type: "POST",
+            data: `{"url": "${imageURL}"}`,
+
+        }).done(function(data) {
+            console.log(data[0].faceAttributes.emotion)
+            var scores = data[0].faceAttributes.emotion;
+            var scoresList = $('#scores');
+            
+            var emotion = Object.keys(data[0].faceAttributes.emotion).reduce((a, b) => data[0].faceAttributes.emotion[a] > data[0].faceAttributes.emotion[b] ? a : b);
+
+            for(var prop in scores) {
+                scoresList.append("<li> " + prop + ": " + scores[prop] + "</li>")
+            }
+
+            console.log(emotion)
+
+            if (emotion == "anger") {
+                emotion = "Action"
+            }
+            if (emotion == "contempt") {
+                emotion = "Crime"
+            }
+            if (emotion == "disgust") {
+                emotion = "Adventure"
+            }
+            if (emotion == "fear") {
+                emotion = "Horror"
+            }
+            if (emotion == "happiness") {
+                emotion = "Comedy"
+            }
+
+            
+            $("#movies").html("");
+
+            $.ajax({ url: `https://api.themoviedb.org/3/search/movie?api_key=6e1b8777347082a5bc02993cce05f3ab&language=en-US&query=${emotion}&page=1&include_adult=false`}
+            ).then(function (movie) {
+
+                var posterLink = "https://image.tmdb.org/t/p/w500";
+                var title = [];
+                var poster = [];
+                var rating = [];
+
+                for (var i = 0; i < 20; i++) {
+                    title.push(movie.results[i].title);
+                    poster.push("https://image.tmdb.org/t/p/w500" + movie.results[i].backdrop_path);
+                    rating.push(movie.results[i].popularity);
+
+                    $("#movies").append(`<div><p>${title[i]}</p>
+                        <img src="${poster[i]}" alt="Movie Poster Not Found"/>
+                        <p>Rating ${rating[i]}</p></div>`)
+                }
+
+
+            })
+        }).fail(function(err) {
+            alert("Error: " + JSON.stringify(err));
+        });
+    });
+    </script>
+  </body>
+</html>
